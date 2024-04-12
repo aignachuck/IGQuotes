@@ -1,0 +1,255 @@
+<apex:page controller="IGQuoteCreator" renderAs="pdf" applyBodyTag="false" showHeader="false" standardStylesheets="false">
+    <head>
+
+        <style type="text/css" media="print">
+
+            @page:first {
+                @top-right {
+                    content: element(header);
+                }
+
+            }
+
+            @page {
+                @bottom-left {
+                    content: element(footer);
+            }
+            }
+
+            div.header {
+            	background: url("{!$Resource.LogoIGDark}");
+                background-repeat: no-repeat;
+            	margin-top: 30px;
+            	height: 130px;
+            	width: 715px;
+            	text-align: center;
+            	position: running(header);
+            }
+
+            div.content {
+            	padding-top: 130px;
+            }
+
+            div.contentMain {
+            	padding-top: 130px;
+                page-break-after: always;
+            }
+
+            div.footer {
+            	display: block;
+            	padding: 5px;
+                position: running(footer);
+            }
+
+            div.subfooter {
+            	display: inline-block;
+            }
+
+            div.right {
+            	float: right;
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+            	content: counter(pages);
+            }
+
+            .stationName {
+                text-align: center;
+            	font-weight: bold;
+            	font-size: 20pt;
+            	margin-bottom: 30px;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            table {
+            	width: 100%;
+            }
+
+            .centered {
+            	text-align: center;
+            }
+
+            .right {
+            	text-align: right;
+            }
+
+            .left{
+                text-align: left;
+            }
+
+            .tableHeader {
+            	border-width: 0px 0px 1px 0px;
+            	border-color: #000;
+            	border-style: solid;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .tableBody{
+                font-size: 10pt;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .sectionHeader {
+            	width: 100%;
+            	background-color: #B3F506;
+                text-decoration-color: #123C4A
+            	font-size: 22pt;
+            	padding: 5px;
+            	margin: 20px 0px;
+            	font-weight: bold;
+                /* font-style: italic; */
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .finePrint{
+                font-size: 10pt;
+                font-family: Arial, Helvetica, sans-serif;
+                font-style: italic;
+            }
+            
+            .container {
+                background-color:#2E4272;
+                display:flex;
+            }
+            .fixed {
+                background-color:#4F628E;
+                width: 100px;
+            }
+            .flex-item {
+                background-color:#31d61b;
+                flex-grow: 1;
+            }
+          </style>
+    </head>
+
+
+<!-- account Name/ Billing Address
+
+Property Name
+Property Address
+
+Product
+Quantity
+Property 
+Cost-->
+
+<div class="header"></div>
+<div class="contentMain">
+    <h1 class="stationName">Order Form</h1>
+    <apex:pageBlock>
+        <apex:pageBlockSection columns="1">
+            <apex:outputText value="{!Account.Name}" label="Company Name"/>
+            <apex:outputText value="{!Opportunity.Name}" />
+            <apex:outputText value="{!Opportunity.Opportunity_Owner_Name__c}" label="Owner Name"/>
+            <apex:outputText value="{!Opportunity.Conga_Term__c}" label="Term"/>
+            <apex:outputText value="{0, date, MMMM d','  yyyy}" label="Quote Expiration Date">
+                <apex:param value="{!Opportunity.Conga_Quote_Expiration_Date__c}"/>
+            </apex:outputText>
+        </apex:pageBlockSection>
+        <div class="sectionHeader">{!$ObjectType.Property__c.labelPlural}</div>
+        <apex:pageBlockSection columns="1">
+            <apex:pageBlockTable value="{!Props}" var="property" headerClass="tableHeader" rowClasses="tableBody">
+                <apex:column value="{!property.Name}" headerClass="left"/>
+                <apex:column value="{!property.Street_Address__c}" headerClass="left" styleClass="left"/>
+                <apex:column value="{!property.City__c}" headerClass="right" styleClass="right"/>
+            </apex:pageBlockTable>
+        </apex:pageBlockSection>
+
+        <div class="sectionHeader">Line Items</div>
+        <apex:pageBlockSection>
+            <apex:pageBlockTable value="{!opptyList}" var="opp"> 
+                <!-- <apex:column value="{!opp.Account.Name}"/> -->
+                <apex:column > 
+                    <apex:pageBlockTable value="{!opp.OpportunityLineItems}" var="o" headerClass="tableHeader" rowClasses="tableBody"> 
+                        <apex:column value="{!o.Order__r.OrderNumber}"/>
+                        <apex:column value="{!o.Order__r.Property__r.Name}"/>
+                        <apex:column value="{!o.PriceBookEntry.Product2.Name}" />
+                        <apex:column value="{!o.Quantity}"/> 
+                        <apex:column value="{!o.UnitPrice}"/> 
+                        <!-- <apex:column value="{!o.PriceBookEntry.Product2.Family}"/> -->
+                        <!-- <apex:column value="{!o.OpportunityId}"/> -->
+                    </apex:pageBlockTable> 
+                </apex:column> 
+            </apex:pageBlockTable> 
+
+           
+        </apex:pageBlockSection>
+            <br/>
+        <apex:pageBlockSection>
+            <apex:pageBlockTable value="{!Opportunity}" var="opp2" headerClass="tableHeader" rowClasses="tableBody"> 
+                <!-- <apex:column value="{!opp2.MRR__c}"/>  -->
+                <apex:column headerValue="One-Time Fees" value="{!opp2.Total_Setup_Value__c}" />
+                <apex:column headerValue="Annual Fee" value="{!opp2.ARR__c}"/> 
+                <apex:column>
+                    <apex:facet name="header">TCV</apex:facet>
+                    <apex:outputText value="{0, Number, Currency}" >
+                        <apex:param value="{!TotalContractValue}" />
+                    </apex:outputText>
+                </apex:column>
+            </apex:pageBlockTable> 
+        </apex:pageBlockSection>
+        <br/>
+
+    </apex:pageBlock>
+
+
+
+</div>
+
+<div>
+    <apex:pageBlock>
+        <div class="sectionHeader">Signatures</div>
+        <apex:pageBlockSection>
+            <div style="width: 100%; overflow: visible">
+                <div style="width: 300px; float: left;"> 
+                    Company Name: ______________________ <br/>
+                    By (Signature): _______________________ <br/>
+                    Name (Printed): ______________________ <br/>
+                    Title: _______________________________<br/>
+                    Date: _______________________________<br/>    
+                </div>
+                <div style="margin-left: 330px;">
+                    Infogrid <br/>
+                    By (Signature): ____________________<br/>
+                    Name (Printed): ___________________<br/>
+                    Title: ____________________________ <br/>
+                    Date: ____________________________<br/>    
+                </div>
+           </div>
+
+            <div style="white-space:nowrap">
+                <div style="display: inline-block">
+                _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+                </div>
+                <div style="display: inline-block">
+                _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+                </div>
+            </div>
+            
+        </apex:pageBlockSection>
+
+        <div class="sectionHeader">Terms and Conditions</div>
+        <apex:pageBlockSection>
+            <div class="finePrint">
+            This Order Form is entered into and between Infogrid and the Customer identified above. 
+            If applicable, Order Form is also entered into and between Infogrid and Affiliate entity listed above. 
+            This Quote and Order Forms referenced are governed by the Agreement found at <a href="https://www.infogrid.io/standard-terms-and-conditions?__hstc=&__hssc=&hsCtaTracking=1ac3a33f-d182-42a2-a9ae-de3f3cd2377e%7Cee8201ac-2a97-46dc-9813-5c8c672679d9">infogrid.com</a> 
+            unless customer has a written master services agreement executed by Infogrid.
+            </div>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+</div>
+
+    
+    <div class="footer">
+        <div class="centered">Generated by {!$User.FirstName} {!$User.LastName}</div>
+        <div>
+            <div class="subfooter">{!NOW()}</div>
+            <div class="subfooter right">Page <span class="pagenumber"/> of <span class="pagecount"/></div>
+        </div>
+    </div>
+</apex:page>
