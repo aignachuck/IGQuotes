@@ -1,17 +1,6 @@
 @IsTest(SeeAllData=true)
 public with sharing class IGQuotePageTest {
-    // @IsTest(SeeAllData=true)
-    // public IGQuotePageTest1() {
-
-    //     Create opp, Account, Order, Property, Price Book Entry, Product, Contact?
-
-    //     Account testAccount = new Account();
-    //     testAccount.Name = 'Test Acct 1';
-    //     testAccount.Stage__c = 'Opportunity';
-    //     testAccount.BillingAddress = ' 2 Test Street';
-
-        
-    // }
+   
 
     @IsTest(SeeAllData=true)
     static void QuoteTest1(){
